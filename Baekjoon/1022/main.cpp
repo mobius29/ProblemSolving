@@ -1,6 +1,10 @@
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdlib>
+#include <iomanip>
 #include <iostream>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -25,50 +29,33 @@ using Input = tuple<int, int, int, int>;
 
 void solve(const Input &inputs) {
   const auto [r1, c1, r2, c2] = inputs;
-  const int row_cnt = r2 - r1 + 1, col_cnt = c2 - c1 + 1;
+  const int R = r2 - r1 + 1, C = c2 - c1 + 1;
 
-  Vec2<int> ret(row_cnt, Vec<int>(col_cnt, 0));
+  Vec2<ll> A(R, Vec<ll>(C, 0ll));
 
-  auto _check = [&](const int r, const int c) { return r1 <= r && r <= r2 && c1 <= c && c <= c2; };
+  auto _value_at = [](ll r, ll c) {
+    auto n = max(abs(r), abs(c));
+    auto M = (2 * n + 1) * (2 * n + 1);
 
-  enum Dir { Up, Left, Down, Right };
-  auto _move = [](int &r, int &c, Dir &dir) {
-    r += dx[dir], c += dy[dir];
-    if (r >= 0 && c >= 0) {
-      if (r + 1 == c) dir = Up;
-    } else if (abs(r) == abs(c)) {
-      if (dir == Up) dir = Left;
-      else if (dir == Left) dir = Down;
-      else if (dir == Down) dir = Right;
-      else if (dir == Right) dir = Up;
-    }
+    if (r == n) return M - (n - c);
+    if (r == -n) return M - (4 * n + c + n);
+    if (c == n) return M - (6 * n + r + n);
+    if (c == -n) return M - (2 * n + (n - r));
+
+    return -1ll;
   };
 
-  int cur_r = 0, cur_c = 0, cur_v = 0, cur_filled = 0;
-  Dir cur_dir = Right;
-
-  while (cur_filled < row_cnt * col_cnt) {
-    cur_v++;
-    if (_check(cur_r, cur_c)) {
-      ret[cur_r - r1][cur_c - c1] = cur_v;
-      cur_filled++;
+  auto max_v = -1ll;
+  for (int i = 0; i < R; i++) {
+    for (int j = 0; j < C; j++) {
+      A[i][j] = _value_at(i + r1, j + c1);
+      max_v = max(max_v, A[i][j]);
     }
-    _move(cur_r, cur_c, cur_dir);
   }
 
-  auto _get_digit = [](int n) {
-    int ret = 0;
-    while (n) { n /= 10, ret++; }
-    return ret;
-  };
-  auto max_digit = _get_digit(cur_v);
-
-  for (const auto &r : ret) {
-    for (const auto &cell : r) {
-      auto cur_digit = _get_digit(cell);
-      for (int i = 0; i < max_digit - cur_digit; i++) cout << ends;
-      cout << cell << ends;
-    }
+  auto max_len = to_string(max_v).size();
+  for (int i = 0; i < R; i++) {
+    for (int j = 0; j < C; j++) { cout << setw(max_len) << A[i][j] << ends; }
     cout << endl;
   }
 }
