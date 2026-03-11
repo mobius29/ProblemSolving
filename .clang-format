@@ -1,0 +1,14 @@
+BasedOnStyle: LLVM
+IndentWidth: 2
+
+ColumnLimit: 120
+---
+Language: Cpp
+
+Cpp11BracedListStyle: false
+
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: None
+---
